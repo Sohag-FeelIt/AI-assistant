@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealth Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .overlay-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+        }
+
+        .listening-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 0, 0, 0.8);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            animation: pulse 1.5s infinite;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .listening-indicator.active {
+            display: flex;
+        }
+
+        .stealth-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stealth-status.visible {
+            opacity: 1;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 300px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            font-size: 13px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .screen-capture-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        .screen-capture-flash.active {
+            animation: flash 0.3s ease-out;
+        }
+
+        .voice-wave {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .voice-wave.active {
+            display: flex;
+        }
+
+        .wave-bar {
+            width: 3px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 2px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        .minimal-cursor {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 123, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .minimal-cursor.active {
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container">
+        <!-- Listening indicator -->
+        <div class="listening-indicator" id="listeningIndicator">
+            🎤
+        </div>
+
+        <!-- Stealth status -->
+        <div class="stealth-status" id="stealthStatus">
+            Stealth Mode Active
+        </div>
+
+        <!-- Notifications -->
+        <div class="notification" id="notification">
+        </div>
+
+        <!-- Screen capture flash -->
+        <div class="screen-capture-flash" id="screenFlash"></div>
+
+        <!-- Voice wave animation -->
+        <div class="voice-wave" id="voiceWave">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <span style="margin-left: 8px; font-size: 12px;">Listening...</span>
+        </div>
+
+        <!-- Minimal cursor indicator -->
+        <div class="minimal-cursor" id="minimalCursor"></div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        class StealthOverlay {
+            constructor() {
+                this.elements = {
+                    listeningIndicator: document.getElementById('listeningIndicator'),
+                    stealthStatus: document.getElementById('stealthStatus'),
+                    notification: document.getElementById('notification'),
+                    screenFlash: document.getElementById('screenFlash'),
+                    voiceWave: document.getElementById('voiceWave'),
+                    minimalCursor: document.getElementById('minimalCursor')
+                };
+
+                this.setupEventListeners();
+                this.setupMouseTracking();
+            }
+
+            setupEventListeners() {
+                // Listen for main process events
+                ipcRenderer.on('listening-started', () => {
+                    this.showListeningIndicator();
+                });
+
+                ipcRenderer.on('listening-stopped', () => {
+                    this.hideListeningIndicator();
+                });
+
+                ipcRenderer.on('stealth-mode-changed', (event, isActive) => {
+                    this.updateStealthStatus(isActive);
+                });
+
+                ipcRenderer.on('screen-captured', () => {
+                    this.showScreenFlash();
+                });
+
+                ipcRenderer.on('show-notification', (event, message) => {
+                    this.showNotification(message);
+                });
+
+                // Global shortcuts for overlay control
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.altKey) {
+                        switch (e.key.toLowerCase()) {
+                            case 'h':
+                                e.preventDefault();
+                                this.toggleVisibility();
+                                break;
+                        }
+                    }
+                });
+            }
+
+            setupMouseTracking() {
+                let mouseTimeout;
+                
+                document.addEventListener('mousemove', (e) => {
+                    // Show minimal cursor in stealth mode
+                    this.elements.minimalCursor.style.left = e.clientX + 'px';
+                    this.elements.minimalCursor.style.top = e.clientY + 'px';
+                    
+                    clearTimeout(mouseTimeout);
+                    this.elements.minimalCursor.classList.add('active');
+                    
+                    mouseTimeout = setTimeout(() => {
+                        this.elements.minimalCursor.classList.remove('active');
+                    }, 2000);
+                });
+            }
+
+            showListeningIndicator() {
+                this.elements.listeningIndicator.classList.add('active');
+                this.elements.voiceWave.classList.add('active');
+                this.showNotification('Voice input active');
+            }
+
+            hideListeningIndicator() {
+                this.elements.listeningIndicator.classList.remove('active');
+                this.elements.voiceWave.classList.remove('active');
+            }
+
+            updateStealthStatus(isActive) {
+                if (isActive) {
+                    this.elements.stealthStatus.classList.add('visible');
+                    setTimeout(() => {
+                        this.elements.stealthStatus.classList.remove('visible');
+                    }, 3000);
+                } else {
+                    this.elements.stealthStatus.classList.remove('visible');
+                }
+            }
+
+            showScreenFlash() {
+                this.elements.screenFlash.classList.add('active');
+                setTimeout(() => {
+                    this.elements.screenFlash.classList.remove('active');
+                }, 300);
+            }
+
+            showNotification(message, duration = 3000) {
+                this.elements.notification.textContent = message;
+                this.elements.notification.classList.add('visible');
+                
+                setTimeout(() => {
+                    this.elements.notification.classList.remove('visible');
+                }, duration);
+            }
+
+            toggleVisibility() {
+                document.body.classList.toggle('hidden');
+            }
+
+            // Method to completely hide overlay during screen sharing
+            enterInvisibleMode() {
+                document.body.style.display = 'none';
+            }
+
+            exitInvisibleMode() {
+                document.body.style.display = 'block';
+            }
+        }
+
+        // Initialize overlay
+        document.addEventListener('DOMContentLoaded', () => {
+            window.stealthOverlay = new StealthOverlay();
+        });
+
+        // Detect screen sharing or recording (basic detection)
+        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+            const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+            navigator.mediaDevices.getDisplayMedia = function(...args) {
+                console.log('Screen sharing detected - entering invisible mode');
+                if (window.stealthOverlay) {
+                    window.stealthOverlay.enterInvisibleMode();
+                }
+                return originalGetDisplayMedia.apply(this, args);
+            };
+        }
+
+        // Additional stealth measures
+        Object.defineProperty(document, 'hidden', {
+            get: function() {
+                return true; // Always report as hidden to screen capture detection
+            }
+        });
+
+        // Hide from accessibility tools
+        document.body.setAttribute('aria-hidden', 'true');
+        document.body.setAttribute('role', 'presentation');
+    </script>
+</body>
+</html>
