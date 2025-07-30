@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealth AI Assistant - Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .settings-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(0, 123, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox:checked {
+            background: rgba(0, 123, 255, 0.8);
+            border-color: rgba(0, 123, 255, 1);
+        }
+
+        .checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: rgba(0, 123, 255, 0.8);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background: rgba(0, 123, 255, 0.8);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            background: rgba(0, 123, 255, 1);
+            transform: translateY(-1px);
+        }
+
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .button.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .button.danger {
+            background: rgba(255, 59, 48, 0.8);
+        }
+
+        .button.danger:hover {
+            background: rgba(255, 59, 48, 1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .api-key-group {
+            position: relative;
+        }
+
+        .api-key-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connected {
+            background: #34c759;
+        }
+
+        .status-indicator.disconnected {
+            background: #ff3b30;
+        }
+
+        .subscription-card {
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 100%);
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .subscription-tier {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .subscription-features {
+            list-style: none;
+            margin: 16px 0;
+        }
+
+        .subscription-features li {
+            padding: 4px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .usage-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #34c759 0%, #ff9500 70%, #ff3b30 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .shortcut-key {
+            display: inline-block;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+            margin: 0 2px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            color: #ffffff;
+            border-bottom: 2px solid rgba(0, 123, 255, 0.8);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Settings</h1>
+            <p>Configure your Stealth AI Assistant</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="general">General</button>
+            <button class="tab" data-tab="providers">AI Providers</button>
+            <button class="tab" data-tab="shortcuts">Shortcuts</button>
+            <button class="tab" data-tab="subscription">Subscription</button>
+        </div>
+
+        <!-- General Settings -->
+        <div class="tab-content active" id="general">
+            <div class="settings-section">
+                <h2 class="section-title">🎨 Appearance</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <select class="form-select" id="theme">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="auto">Auto</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Opacity</label>
+                    <div class="slider-group">
+                        <input type="range" class="slider" id="opacity" min="0.3" max="1.0" step="0.1" value="0.9">
+                        <span class="slider-value" id="opacityValue">90%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Window Position</label>
+                    <select class="form-select" id="position">
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="center">Center</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2 class="section-title">⚡ Behavior</h2>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="autoHide">
+                    <label for="autoHide">Auto-hide when losing focus</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="stealthByDefault">
+                    <label for="stealthByDefault">Start in stealth mode</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="startWithSystem">
+                    <label for="startWithSystem">Start with system</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="notifications">
+                    <label for="notifications">Show notifications</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Providers -->
+        <div class="tab-content" id="providers">
+            <div class="settings-section">
+                <h2 class="section-title">🤖 AI Providers</h2>
+                <p class="help-text">Configure API keys for different AI providers. You need at least one provider configured to use the assistant.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="status-indicator disconnected" id="claudeStatus"></span>
+                        Anthropic Claude API Key
+                    </label>
+                    <div class="api-key-group">
+                        <input type="password" class="form-input" id="anthropicKey" placeholder="sk-ant-api03-...">
+                        <button class="api-key-toggle" onclick="togglePassword('anthropicKey')">👁</button>
+                    </div>
+                    <div class="help-text">Get your API key from <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="status-indicator disconnected" id="openaiStatus"></span>
+                        OpenAI API Key
+                    </label>
+                    <div class="api-key-group">
+                        <input type="password" class="form-input" id="openaiKey" placeholder="sk-...">
+                        <button class="api-key-toggle" onclick="togglePassword('openaiKey')">👁</button>
+                    </div>
+                    <div class="help-text">Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="status-indicator disconnected" id="googleStatus"></span>
+                        Google Gemini API Key
+                    </label>
+                    <div class="api-key-group">
+                        <input type="password" class="form-input" id="googleKey" placeholder="AIza...">
+                        <button class="api-key-toggle" onclick="togglePassword('googleKey')">👁</button>
+                    </div>
+                    <div class="help-text">Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="status-indicator disconnected" id="grokStatus"></span>
+                        Grok API Key (Coming Soon)
+                    </label>
+                    <div class="api-key-group">
+                        <input type="password" class="form-input" id="grokKey" placeholder="Coming soon..." disabled>
+                        <button class="api-key-toggle" onclick="togglePassword('grokKey')">👁</button>
+                    </div>
+                    <div class="help-text">Grok API will be available soon</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Default Provider</label>
+                    <select class="form-select" id="defaultProvider">
+                        <option value="claude">Claude</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="grok">Grok</option>
+                    </select>
+                </div>
+
+                <div class="button-group">
+                    <button class="button" onclick="testConnections()">Test Connections</button>
+                    <button class="button secondary" onclick="saveApiKeys()">Save API Keys</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shortcuts -->
+        <div class="tab-content" id="shortcuts">
+            <div class="settings-section">
+                <h2 class="section-title">⌨️ Keyboard Shortcuts</h2>
+                <p class="help-text">Global shortcuts work even when the assistant is hidden or in stealth mode.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Toggle Assistant</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="shortcut-key">Ctrl</span> + 
+                        <span class="shortcut-key">Shift</span> + 
+                        <span class="shortcut-key">Alt</span> + 
+                        <span class="shortcut-key">A</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Toggle Stealth Mode</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="shortcut-key">Ctrl</span> + 
+                        <span class="shortcut-key">Shift</span> + 
+                        <span class="shortcut-key">Alt</span> + 
+                        <span class="shortcut-key">S</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Voice Input</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="shortcut-key">Ctrl</span> + 
+                        <span class="shortcut-key">Shift</span> + 
+                        <span class="shortcut-key">Alt</span> + 
+                        <span class="shortcut-key">L</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Capture Screen</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="shortcut-key">Ctrl</span> + 
+                        <span class="shortcut-key">Shift</span> + 
+                        <span class="shortcut-key">Alt</span> + 
+                        <span class="shortcut-key">C</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Hide Overlay</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="shortcut-key">Ctrl</span> + 
+                        <span class="shortcut-key">Shift</span> + 
+                        <span class="shortcut-key">Alt</span> + 
+                        <span class="shortcut-key">H</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription -->
+        <div class="tab-content" id="subscription">
+            <div class="settings-section">
+                <h2 class="section-title">💎 Subscription</h2>
+                
+                <div class="subscription-card">
+                    <div class="subscription-tier" id="currentTier">Free Tier</div>
+                    <div id="usageStats">
+                        <p>Daily Usage: <span id="dailyUsage">5/10</span></p>
+                        <div class="usage-bar">
+                            <div class="usage-fill" id="dailyUsageFill" style="width: 50%"></div>
+                        </div>
+                        <p>Monthly Usage: <span id="monthlyUsage">45/100</span></p>
+                        <div class="usage-bar">
+                            <div class="usage-fill" id="monthlyUsageFill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    
+                    <ul class="subscription-features">
+                        <li>✅ Basic AI assistance</li>
+                        <li>✅ Screen capture analysis</li>
+                        <li>✅ Voice input</li>
+                        <li>❌ Advanced automation</li>
+                        <li>❌ Priority support</li>
+                        <li>❌ Custom integrations</li>
+                    </ul>
+                    
+                    <div class="button-group">
+                        <button class="button">Upgrade to Pro</button>
+                        <button class="button secondary">Manage Subscription</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group" style="margin-top: 30px;">
+            <button class="button" onclick="saveSettings()">Save Settings</button>
+            <button class="button secondary" onclick="resetSettings()">Reset to Default</button>
+            <button class="button danger" onclick="closeSettings()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+                
+                // Update tab buttons
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Slider updates
+        document.getElementById('opacity').addEventListener('input', (e) => {
+            const value = Math.round(e.target.value * 100);
+            document.getElementById('opacityValue').textContent = `${value}%`;
+        });
+
+        // Password toggle
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+        }
+
+        // Load settings
+        async function loadSettings() {
+            try {
+                const settings = await ipcRenderer.invoke('get-settings');
+                
+                // Apply settings to form
+                document.getElementById('theme').value = settings.theme || 'dark';
+                document.getElementById('opacity').value = settings.opacity || 0.9;
+                document.getElementById('position').value = settings.position || 'top-right';
+                document.getElementById('autoHide').checked = settings.autoHide || false;
+                document.getElementById('stealthByDefault').checked = settings.stealthByDefault || false;
+                document.getElementById('startWithSystem').checked = settings.startWithSystem || false;
+                document.getElementById('notifications').checked = settings.notifications !== false;
+                document.getElementById('defaultProvider').value = settings.defaultProvider || 'claude';
+                
+                // Update opacity display
+                const opacityValue = Math.round((settings.opacity || 0.9) * 100);
+                document.getElementById('opacityValue').textContent = `${opacityValue}%`;
+                
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            const settings = {
+                theme: document.getElementById('theme').value,
+                opacity: parseFloat(document.getElementById('opacity').value),
+                position: document.getElementById('position').value,
+                autoHide: document.getElementById('autoHide').checked,
+                stealthByDefault: document.getElementById('stealthByDefault').checked,
+                startWithSystem: document.getElementById('startWithSystem').checked,
+                notifications: document.getElementById('notifications').checked,
+                defaultProvider: document.getElementById('defaultProvider').value
+            };
+            
+            try {
+                await ipcRenderer.invoke('save-settings', settings);
+                alert('Settings saved successfully!');
+            } catch (error) {
+                console.error('Failed to save settings:', error);
+                alert('Failed to save settings. Please try again.');
+            }
+        }
+
+        // Save API keys
+        async function saveApiKeys() {
+            const apiKeys = {
+                anthropic: document.getElementById('anthropicKey').value,
+                openai: document.getElementById('openaiKey').value,
+                google: document.getElementById('googleKey').value,
+                grok: document.getElementById('grokKey').value
+            };
+            
+            try {
+                await ipcRenderer.invoke('save-api-keys', apiKeys);
+                alert('API keys saved successfully!');
+                updateConnectionStatus();
+            } catch (error) {
+                console.error('Failed to save API keys:', error);
+                alert('Failed to save API keys. Please try again.');
+            }
+        }
+
+        // Test connections
+        async function testConnections() {
+            const providers = ['claude', 'gpt-4', 'gemini'];
+            
+            for (const provider of providers) {
+                try {
+                    const result = await ipcRenderer.invoke('test-provider', provider);
+                    const statusElement = document.getElementById(`${provider.replace('-', '')}Status`);
+                    if (result.success) {
+                        statusElement.className = 'status-indicator connected';
+                    } else {
+                        statusElement.className = 'status-indicator disconnected';
+                    }
+                } catch (error) {
+                    console.error(`Failed to test ${provider}:`, error);
+                }
+            }
+        }
+
+        // Update connection status
+        function updateConnectionStatus() {
+            // This would check if API keys are configured
+            const providers = ['anthropic', 'openai', 'google', 'grok'];
+            providers.forEach(provider => {
+                const input = document.getElementById(`${provider}Key`);
+                const status = document.getElementById(`${provider === 'anthropic' ? 'claude' : provider === 'openai' ? 'openai' : provider === 'google' ? 'google' : 'grok'}Status`);
+                if (input.value.trim()) {
+                    status.className = 'status-indicator connected';
+                } else {
+                    status.className = 'status-indicator disconnected';
+                }
+            });
+        }
+
+        // Reset settings
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to default?')) {
+                // Reset form to defaults
+                document.getElementById('theme').value = 'dark';
+                document.getElementById('opacity').value = 0.9;
+                document.getElementById('position').value = 'top-right';
+                document.getElementById('autoHide').checked = true;
+                document.getElementById('stealthByDefault').checked = false;
+                document.getElementById('startWithSystem').checked = false;
+                document.getElementById('notifications').checked = true;
+                document.getElementById('defaultProvider').value = 'claude';
+                document.getElementById('opacityValue').textContent = '90%';
+            }
+        }
+
+        // Close settings
+        function closeSettings() {
+            window.close();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateConnectionStatus();
+            
+            // Listen for API key changes
+            ['anthropicKey', 'openaiKey', 'googleKey', 'grokKey'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateConnectionStatus);
+            });
+        });
+    </script>
+</body>
+</html>
